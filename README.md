@@ -1528,3 +1528,367 @@ food, а его значением будет mango.
 возвращает undefined и что возможно установить прототипом объекта другой объект с помощью функции Object.create(). В эту
 функцию вы можете передать первым параметром объект, который будет являться прототипом, а вторым описание свойств, которых
 вы хотели бы установить по-умолчанию в созданном объекте.
+
+### Какая разница между классическим и прототипным наследование в JavaScript?
+
+Чтобы понять данный вопрос, для начала давайте попытаемся понять, что имеется ввиду под классическим наследованием.
+
+Классическое наследование называется так потому что на самом деле речь идет о методах объектной ориентации используемых в
+старых языках программирования как Java, C++, в которых мы имеем классы, которые выступают в качестве плана схемы и затем
+мы создаем экземпляр этого класса. 
+
+Так думая о классе как о архитектектурной чертеже, а об экземпляре как о доме, построенном по специфицикациям этих
+архитектрных чертежей.
+
+Вы не можете жить в архитектурных чертедах, вы можете жить в доме, вот как объектное ориентирование работает в Java, C++.
+Вы создаете класс, который является схемой или чертежом и затем вы создаете экземпляр класса, который как будто построенный
+дома по спецификациям этой схемы или чертежа.
+
+Но в javascript наследование работает используя прототипы, эти прототипы возвращаются к аналогии в наследовании прототипов.
+Новые объекты создаются из существующих объектов. Это не архитектурные чертежи для дома, а мы всего-лишь строим дом основанный
+на уже существующем доме.
+ 
+Так если javascript имеет только прототипное наследование, что люди имеют ввиду, когда они
+говорят классическое наследование? Это значит, что они имеют ввиду, что в js есть метод, который может эмулировать что-то
+похожее на классическое наследование. Иногда это называют классическим наследование, иногда constructor pattern и иногда
+псевдо-классический подход. И честно говоря, это не настоящий классический объектно-ориентированный метод, потому что
+все объекто ориентирование в javascript основано на прототипах.
+
+### Что такое подход Constructor OO Part 1?
+
+Так как же мы реализовываем псевдо-классическое наследование в javascript?  
+
+Этот вопрос обычно задают, чтобы понять знаете ли вы, как реализовать псевдо-классические объектно ориентированные принципы
+в javascript.
+
+Концепты объектно ориентированное программирование и наследования очень сложно учитьв javascript. Не как в Java, C++ или 
+Python, здесь нет стандартов. Нет основных возможностей языка поддерживать это. В ES5 нет структуры называемой Class и
+ключевого слова class, есть только в ES6, но мы можем имитировать путь подобный концепту объектно-ориентированному программированию
+который используется в языках C++, Java, с помощью использования функции конструкторов и ключевого слова new.
+
+Это и есть то о что имеют ввиду люди, когда говорят о классическом или псевдо-классическом наследование в javascript.
+Я бы назвал это constructor pattern. 
+
+Так первая вещь, которую нужно знать об этом - функции конструкторы. В других языках у нас есть концепт класс. Думайте
+об этом как о плане, схеме, чертеже. Класс описывает поведение объект через функции и также состояние объекта через свойства.
+
+ JavaScript не имеет никаких концептов класса, но мы можем имитировать их с помощью функции конструктора.
+ 
+ ```javascript
+'use strict'
+
+function Person(first_name, last_name) {
+}
+```
+
+Посмотрите на это, оно выглядит как стандартная javascript функция, потому что это и есть она.
+
+```javascript
+'use strict'
+
+function Person(first_name, last_name) {
+    this.first_name = first_name;
+    this.last_name = last_name;
+}
+```
+
+Но что я собираюсь сделать с этой функцией, я собираюсь взять параметры, что я передал в функцию, присвоить их как свойства
+этого объекта. Так функция выше сама по себе не выглядит как класс и если мы попытаемся вызвать ее, то ничего не произойдет.
+
+```javascript
+'use strict'
+
+function Person(first_name, last_name) {
+    this.first_name = first_name;
+    this.last_name = last_name;
+}
+
+var dude = Person("asim", "hussain");
+```
+
+Так я создаю переменную с именем dude и вызываю функцию Person в которую передаю имя и фамилию. И когда мы запустим наш код,
+то получим ошибку, что не возможно установить свойсва first_name потому что оно является undefined. Потому что this в use strict
+является undefined, если функция имеет глобальный контекст. 
+
+Но если мы попробуем использовать new ключевое слово
+
+```javascript
+'use strict'
+
+function Person(first_name, last_name) {
+    this.first_name = first_name;
+    this.last_name = last_name;
+}
+
+var dude = new Person("asim", "hussain");
+console.log(dude); // object dude
+```
+
+Теперь уже не будет никаких ошибок, потому что dude - это теперь у нас объект, в котором есть два свойства first_name и
+last_name со значениями, которые мы передали в нашу функцию конструктор.
+
+И это было бы тоже самое, что если бы мы написали так:
+
+```javascript
+'use strict'
+
+function Person(first_name, last_name) {
+    this.first_name = first_name;
+    this.last_name = last_name;
+}
+
+var dude = {};
+Person.call(dude, 'asim', 'hussain')
+console.log(dude); // object dude
+```
+
+Это не совсем то же самое, я не хочу, чтобы вы отошли от мысли, что ключевое слово "New" в основном выполняет
+это действие как с call. Это не так, на самом деле оно делает кучу других вещей. Но я только хочу показать вам, что это
+оно делает и эта магия делается с помощью вещей, которые вы уже знаете.
+
+Так мы можем добавлять свойства внутрь нашего класса. Так это то как называют, мы можем добавить данные в экземпляр
+класса. Так как мы можем иметь функции в наших классах? Есть два пути сделать в псевдо-классическом подходе.
+
+Первый: 
+```javascript
+'use strict'
+
+function Person(first_name, last_name) {
+    this.first_name = first_name;
+    this.last_name = last_name;
+    this.full_name = function() {
+        return this.first_name + ' ' + this.last_name;
+    }
+}
+
+var dude = new Person("asim", "hussain");
+console.log(dude.full_name()); // assim hussain
+```
+
+Другой способ используя прототипы или функции прототипов. Теперь чтобы понять, что я имею ввиду под функциями прототипами,
+давайте разберем это утверждение:
+
+```javascript
+var dude = new Person('asim', 'hussain');
+```
+
+Сейчас мы углубимся в понимание значения ключевого слова new и поймем как на самом деле оно работает.
+
+Мы создаем экземпляр псевдо класса person с помощью вызова ключевого слова new конструктора person. И мы создаем экземпляр
+с именем dude и у него есть свойства first_name и last_name. И как мы знаем, что все объекты в javascript имеют прототипы.
+Так на что же у нас указывает свойство __proto__ в dude? Чтобы понять, мы должны понимать что функции в javascript так же
+имеют свойство prototype и да, я знаю, это может сбивать с толку. У нас есть prototype на функциях и __proto__ на объектах.
+
+![](pics/prototype_inheritance.png)
+
+Так prototype свойство функций указывает на объект, у которого есть свойство constructor, которое указывает на person (самого себя)
+но также потому что этот объект имеет так же свое собственное свойство __proto__ и как в остальных объекта в javascript, 
+оно указывает на другой объект и тд и в конечном итоге указывает на null. И так вернемся к вопросу на что указвыает прототип
+свойство нашего dude? И ответ - он указывает на объект в prototype person.
+
+![](./pics/prototype_inheritance2.png)
+
+это то, как он выглядит в конечном итоге, когда он имеет цепочку прототипов, где экземпляр, который создается, указывает 
+на прототип функции-конструктора, который использовался для создания экземпляра, и снова и снова по цепочке, пока вы не 
+достигнете null.
+
+Теперь мы понимаем, что функция person имеет свое собственное prototype свойство и оно добавляется
+в цепочку прототипов dude. И мы можем добавлять функции в прототип person, которые затем сделает
+доступным dude в его цепочке прототипов. Позвольте показать с помощью примера:
+
+```javascript
+'use strict'
+
+function Person(first_name, last_name) {
+    this.first_name = first_name;
+    this.last_name = last_name;
+    this.full_name = function() {
+        return this.first_name + ' ' + this.last_name;
+    }
+}
+
+Person.prototype.full_name_prototype = function() {
+    return this.first_name + ' ' + this.last_name;
+}
+
+var dude = new Person("asim", "hussain");
+console.log(dude.full_name_prototype()); // assim hussain
+```
+
+Если мы продебажим наш код и заглянем в объект dude, то увидим, что в свойства __proto__ у нас появилая наша новая
+функция full_name_prototype.
+
+![](./pics/prototype_inheritance3.png)
+
+Преимуществом второго подхода - прототипного подхода, является, что если вы создаете несколько экземпляров, то они
+все делят один и тот же прототип и функции, что вы добавляете, например как мы full_name-prototype, добавляются в этот
+прототип. Так это сохраняет память, например если вы создаете большое количество этих экземпляров.
+
+![](./pics/prototype_inheritance4.png)
+
+Так с первым методом, методом, где мы добавляли функцию прямо в тело функции конструктора, мы по-настоящему добавляли функцию
+и повторяли ее для каждого экземпляра, что мы создали. И когда-нибудь это может раздуть ваше приложение.
+
+Но есть одно преимущество иметь функции в теле функции конструктора и это потому что там вы можете
+моделировать приватную переменную.
+
+И это очередная возможность объектно ориентированного подхода. Она говорит, что вы можете иметь свойства, которые
+доступны публично и свойства, которые приватные. По-умолчанию все что находится внутри конструктора является доступным и публичным.
+
+```javascript
+'use strict'
+
+function Person(first_name, last_name) {
+    this.first_name = first_name;
+    this.last_name = last_name;
+    this.full_name = function() {
+        return this.first_name + ' ' + this.last_name;
+    }
+}
+var dude = new Person("asim", "hussain");
+dude.first_name = 'Moo';
+console.log(dude.full_name()); // Moo hussain
+```
+
+Так мы можем поменять имя в нашем объекте. Но возможно в нашей архитектуре, мы хотим сделать так чтобы имя было неизменяемым.
+Как мы можем реализовать эту функциональность? А это возможность мы можем получить через замыкания. Вместо того, чтобы в функции
+full_name ссылаться на this.first_name и this.last_name мы можем ссылаться на first_name и last_name (параметры, которые
+передаются в нашу функцию конструктор).
+
+```javascript
+'use strict'
+
+function Person(first_name, last_name) {
+    this.first_name = first_name;
+    this.last_name = last_name;
+    this.full_name = function() {
+        return first_name + ' ' + last_name;
+    }
+}
+var dude = new Person("asim", "hussain");
+dude.first_name = 'Moo';
+console.log(dude.full_name()); // asim hussain
+```
+
+Так если вы помоните из замыканий, пока функция this.full_name в теле функции Person нуждается в first_name и last_name,
+JavaScript будет держать ссылку на first_name and last_name доступным для функции full_name.
+
+Данная часть показывает как реализовать инкапсуляцию с помощью данного подхода. Но в объектно ориентированном подходе есть
+еще и наследование, как мы будем реализовывать и ее?
+
+```javascript
+'use strict'
+
+function Person(first_name, last_name) {
+    this.first_name = first_name;
+    this.last_name = last_name;
+}
+
+Person.prototype.full_name = function() {
+    return this.first_name + ' ' + this.last_name;
+}
+
+var dude = new Person("asim", "hussain");
+console.log(dude.full_name()); // assim hussain
+```
+
+Теперь я хочу иметь еще один псевдо класс под название professional, который наследуется от Person, который имеет все
+свойства и методы, что Person class, но так же позволяет добавлять больше свойства и возможно больше функции.
+
+```javascript
+'use strict'
+
+function Person(first_name, last_name) {
+    this.first_name = first_name;
+    this.last_name = last_name;
+}
+
+Person.prototype.full_name = function() {
+    return this.first_name + ' ' + this.last_name;
+}
+
+function Professional(honorific, first_name, last_name) {
+    Person.call(this, first_name, last_name);
+    this.honorific = honorific;
+}
+```
+
+Это на самом деле не реализует никакое наследование.  Теперь давайте попробуем добавить функцию прототип к нашему новому
+псевдоклассу.
+
+```javascript
+'use strict'
+
+function Person(first_name, last_name) {
+    this.first_name = first_name;
+    this.last_name = last_name;
+}
+
+Person.prototype.full_name = function() {
+    return this.first_name + ' ' + this.last_name;
+}
+
+function Professional(honorific, first_name, last_name) {
+    Person.call(this, first_name, last_name);
+    this.honorific = honorific;
+}
+
+Professional.prototype.professional_name = function() {
+    return this.honorific + ' ' + this.first_name + ' ' + this.last_name;
+}
+
+var prof = new Professional("Dr.", "Asim", "Hussain");
+console.log(prof.professional_name()); // Dr. Assim Hussain
+console.log(prof.full_name()); // TypeError: prof.full_name is not a function
+```
+
+Ошбика возникает, потому что javascript не может найти функцию full_name в цепочки прототипов нашего объекта prof. Поэтому
+у нас не получилось реализовать наследование, так как же нам это сделать? Мы легко можем получить доступ к прототипу нашего псевдо
+класс Person через Object.create
+
+```javascript
+'use strict'
+
+function Person(first_name, last_name) {
+    this.first_name = first_name;
+    this.last_name = last_name;
+}
+
+Person.prototype.full_name = function() {
+    return this.first_name + ' ' + this.last_name;
+}
+
+function Professional(honorific, first_name, last_name) {
+    Person.call(this, first_name, last_name);
+    this.honorific = honorific;
+}
+
+Professional.prototype = Object.create(Person.prototype);
+
+Professional.prototype.professional_name = function() {
+    return this.honorific + ' ' + this.first_name + ' ' + this.last_name;
+}
+
+var prof = new Professional("Dr.", "Asim", "Hussain");
+console.log(prof.professional_name()); // Dr. Assim Hussain
+console.log(prof.full_name()); // Assim Hussain
+```
+
+Так что же здесь происходит? Давайте разберем:
+
+```javascript
+Professional.prototype = Object.create(Person.prototype);
+```
+
+![](./pics/prototype_inheritance5.png)
+
+У нас есть 2 псевдо класса Person и Professional и прототип для Person псевдо класса имеет full_name() функцию, но
+действитель 2 совершенно не связанные вещи - нет связи между двумя прототипными цепями. Как сделать full_name функцию
+доступной в экземпляре Professional псевдо класса? Давайте пройдемся шаг за шагом
+
+1. Мы заменяем существующий объект прототип в функции Professional на созданный с помощью Object.create(). И мы помним,
+что Object.create() cоздает объект, чей __proto__ своейство указывает на объект переданный первым параметром и мы передаем
+туда прототип Person. То есть теперь мы создаем связь между прототипом Professional и прототипом Person.
+
+![](./pics/prototype_inheritance6.png)
+
