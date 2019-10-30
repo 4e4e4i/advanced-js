@@ -1905,10 +1905,223 @@ Professional.prototype = Object.create(Person.prototype);
 И так как функция full_name теперь находится в цепочке прототипов для нашего professional экземпляра, теперь мы можем
 вызвать ее.
 
+### Что такое Прототипное наследование?
 
+Прототипное наследование - альтернатива объектно-ориентированному решению. Многие утверждают, что наиболее естестественное
+ОО решение для javascript, но в конечном итоге, потому что его легче понять. И на этот вопрос намного легче ответить.
 
+Важная вещь, которую стоит понимать о прототипном наследование - это то что мы уже ответили на это. Это всего-лишь
+цепочка прототипов и ничего больше и не меньше. Мы не создаем Класс или Псевдо класс, как мы делаем это в классическом
+наследовании. Там нет функций конструкторов и нам не нужно использовать new ключевое слово. Обычно мы говорим "Эй создай объект
+у которого прототипом является другой объект, о и так же пожалуйста положи в новый объект несколько свойств".
 
+ Одним из польз от использования прототипного подхода - это то что мы работаем с инструментами, которые JS предлагает,
+ вместо того чтобы пытаться имитировать фичи других языков, как наши фейковые классы, как мы пытались создавать функции
+ конструкторы и new ключевое слово. 
+ 
+ Позвольте мне показать пару примеров:
+ 
+ Я собираюсь создать объект Person. И вы узнаете этот код, у объекта есть тот же метод full_name, что мы имеи
+ в предыдущих вопросах:
+ 
+ ```javascript
+var Person = {
+    full_name: function() {
+        return this.first_name + " " + this.last_name;
+    }
+}
+```
 
+Это наш основной объект Person. Затем мы создадим другой объект, прототип которого будет указывать на этот базовый объект.
 
+Делаем мы это, используя Object.create():
 
+```javascript
+var Person = {
+    full_name: function() {
+        return this.first_name + " " + this.last_name;
+    }
+}
 
+var asim = Object.create(Person);
+console.log(asim); // Object {}
+```
+ 
+Теперь мы создали объект asim, его прототип указывает на объект person, и с помощью использования Object.create()
+и что в принципе создается - это структура на картинке ниже:
+
+![](./pics/prototype_inheritance8.png)
+
+У нас есть asim объект и прототип asim объекта, указывающий на person объект и прототип person объекта, но конечно,
+прототип person объекта так же указывает на объект, просто не хватило место на экране, чтобы это отобразить.
+
+И это то, что мы сделали, мы создали цепочку прототипов и важная вещь, которую нужно знать, это то, что на объекте Person
+у нас есть функция full_name, а сам объект является прототипов asim объекта. То есть это означает, что если я хотел бы
+вызвать full_Name функция, я бы сделали только это asim.full_name(). И это ничего бы не вернуло кроме undefined undefined
+потому что у нас не было определены first_name and last_name. Так как бы мы сделали это в прототипном подходе. В
+constructor pattern у нас есть функция конструктор и внутри мы могли изначально загрузить значения этих переменных, но мы 
+не имеем ничего подобного в прототипном подходе. Я покажу вам пару различных путей решить данную проблему.
+
+Первый путь, который я покажу вам - всего-лишь создание еще одной функции в объекте person. Назовем ее init:
+
+```javascript
+var Person = {
+    init: function(first_name, last_name) {
+        this.first_name = first_name;
+        this.last_name = last_name;
+        return this;
+    },
+    full_name: function() {
+        return this.first_name + " " + this.last_name;
+    }
+}
+
+var asim = Object.create(Person);
+console.log(asim); // Object {}
+```
+
+Теперь у нас есть функция init, которая изначально присваивает значения из аргументов в свойства this и 
+возвращает сам this. Теперь если я хочу инициализировать, я всего-лишь напишу aym.init('asim', 'hussain');
+
+```javascript
+var Person = {
+    init: function(first_name, last_name) {
+        this.first_name = first_name;
+        this.last_name = last_name;
+        return this;
+    },
+    full_name: function() {
+        return this.first_name + " " + this.last_name;
+    }
+}
+
+var asim = Object.create(Person);
+asim.init("asim", "hussain");
+console.log(asim.full_name()); // assim hussain
+```
+
+Второй способ инициализировать Asim объект - это с помощью второго параметра в Object.create(). Если вы помните, второй
+параметр в Object.create описывает свойства, которые им хотим создать на объекте
+
+```javascript
+var Person = {
+    full_name: function() {
+        return this.first_name + " " + this.last_name;
+    }
+}
+
+var asim = Object.create(Person, {
+    first_name: {
+        value: 'Asim'
+    },
+    last_name: {
+        value: 'Hussain'
+    }
+});
+console.log(asim.full_name()); // assim hussain
+```
+
+Но я предпочитаю третье решение: 
+
+Я собираюсь создать другую функцию, под название PersonFactory
+
+Factory - это функция, которая возвращает объект. Поэтому мы можем всего-лишь переместить наш Object.create()
+функции внутрь нее.
+
+```javascript
+var Person = {
+    full_name: function() {
+        return this.first_name + " " + this.last_name;
+    }
+}
+function PersonFactory(first_name, last_name) {
+    var person = Object.create(Person);
+    person.first_name = first_name;
+    person.last_name = last_name;
+    return person;
+}
+
+var asim = PersonFactory("Asim", "Hussain")
+console.log(asim.full_name()); // assim hussain
+```
+
+Так мы покрыли, как создавать экземпляр объекта, который указывает на другие объекты с помощью прототипа. Так следующий
+вопрос - Как реализовать наследование?
+
+В прототипном подходе нет никаких определенных методологий для наследования. Мы всего-лишь продолжаем добавлять в цепь прототипов.
+
+Давайте посмотрим напримере снова с экземпляром Professional, который наследуется от Person.
+
+```javascript
+var Person = {
+    full_name: function() {
+        return this.first_name + " " + this.last_name;
+    }
+}
+
+var Professional = Object.create(Person);
+
+var asim = Object.create(Professional);
+```
+
+Так мы создаем цепочку прототипов, давайте взглянем на схеме:
+
+![](./pics/prototype_inheritance9.png)
+
+У нас есть asim объект, прототип которого указывает на Professional объект, прототип которого указывает на Person объект.
+
+И чтобы добавить какой-либо метод мы можем так же использвать второй аргумент у Object.create
+
+```javascript
+var Person = {
+    full_name: function() {
+        return this.first_name + " " + this.last_name;
+    }
+}
+
+var Professional = Object.create(Person, {
+    init: {
+        value: function(honorific, first_name, last_name) {
+          this.honorific = honorific;
+          this.first_name = first_name;
+          this.last_name = last_name;
+        }
+    },
+    professional_name: {
+        value: function() {
+          return this.honorific + " " + this.first_name + " " + this.last_name;
+        }
+    }
+});
+
+var asim = Object.create(Professional);
+asim.init("mr.", "asim", "hussain");
+
+console.log(asim.full_name());
+console.log(asim.professional_name());
+```
+
+или альтернативным путем:
+
+```javascript
+var Person = {
+    full_name: function() {
+        return this.first_name + " " + this.last_name;
+    }
+}
+
+var Professional = Object.create(Person);
+
+function ProfessionalFactory(honorific, first_name, last_name) {
+    var human = Object.create(Professional);
+    human.honorific = honorific;
+    human.first_name = first_name;
+    human.last_name = last_name;
+    return human;
+}
+
+var asim = ProfessionalFactory("mr.", "asim", "hussain");
+
+console.log(asim.full_name());
+console.log(asim.professional_name());
+```
