@@ -3,7 +3,7 @@
 
 *Содержание:*
 
-* [Разница между bubbling и capturing](#----bubbling---capturing--a-namecapturingbubblinga)
+* [Разница между bubbling и capturing](#capturing&bubbling)
 
 ### Что такое 'use strict' и для чего он нужен
 
