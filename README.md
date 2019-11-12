@@ -1,6 +1,10 @@
 
 # Advanced js
 
+*Содержание:*
+
+* [Разница между bubbling и capturing](#----bubbling---capturing--a-namecapturingbubblinga)
+
 ### Что такое 'use strict' и для чего он нужен
 
 Что делает 'use strict'? Это частый вопрос, который мы можем встретить на собеседовании, неплохое начало для разговора.
@@ -2254,3 +2258,5 @@ asimFunction([
 Так я создал файл, который запрашивает прогноз погоды с yahooapi с помощью JSONP
 
 ![](./pics/JSONP.png)
+
+### Какая разница между событиями bubbling (всплытие) и capturing (погружение) <a name="capturing&bubbling"></a>
